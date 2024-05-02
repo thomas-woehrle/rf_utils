@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from vision import get_keypoints_from_pred
+from rf_utils.vision import get_keypoints_from_pred
 
 
 @dataclass
