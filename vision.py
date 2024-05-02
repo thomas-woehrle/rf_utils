@@ -1,22 +1,30 @@
 import numpy as np
 from typing import Optional
 
+import torch
 
-def get_keypoints_from_pred(pred: np.ndarray, factor: int = 1) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+
+def get_keypoints_from_pred(pred: np.ndarray, shape: tuple[int, int] = (56, 80), factor: int = 1) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
     """Returns the keypoints from the prediction
 
     Args:
-        pred: Prediction from the model. Expected shape (3, H, W)
+        pred: Prediction from the model. Expected shape (B, 3, H, W)
+        shape: Shape of the prediction
         factor: Extracted keypoints are multiplied with this. Defaults to 1.
 
     Returns:
         Tuple of keypoints (vp, ll, lr)
     """
-    vp_y, vp_x = np.unravel_index(pred[0].argmax(), pred[0].shape)
-    ll_y, ll_x = np.unravel_index(pred[1].argmax(), pred[1].shape)
-    lr_y, lr_x = np.unravel_index(pred[2].argmax(), pred[2].shape)
+    batch_size = pred.shape[0]
+    flattened_indices = torch.argmax(pred.view(batch_size, 3, -1), dim=2)
 
-    return (vp_x * factor, vp_y * factor), (ll_x * factor, ll_y * factor), (lr_x * factor, lr_y * factor)
+    height, width = shape
+    y_coords = flattened_indices // width
+    x_coords = flattened_indices % width
+
+    indices = torch.stack((x_coords, y_coords), dim=2)
+
+    return indices * factor
 
 
 def min_max_norm(img: np.ndarray) -> np.ndarray:
@@ -75,6 +83,8 @@ def get_coordinates_on_frame(vp: tuple[int, int], kp: tuple[int, int], dim: tupl
     line2 = ((0, dim[1]), (dim[0], dim[1]))
     intersect = find_intersection(line1, line2)
     if intersect == None:
+        if torch.is_tensor(kp):
+            kp = kp[0].item(), kp[1].item()
         return kp
 
     if intersect[0] > dim[0] or intersect[0] < 0:
@@ -86,6 +96,8 @@ def get_coordinates_on_frame(vp: tuple[int, int], kp: tuple[int, int], dim: tupl
         intersect = find_intersection(line1, line2)
 
     if intersect == None:
+        if torch.is_tensor(kp):
+            kp = kp[0].item(), kp[1].item()
         return kp
 
     return intersect
