@@ -4,7 +4,7 @@ from typing import Optional
 import torch
 
 
-def get_keypoints_from_pred(pred: np.ndarray, shape: tuple[int, int] = (56, 80), factor: int = 1) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+def get_keypoints_from_pred(pred: np.ndarray, shape: tuple[int, int] = (56, 80), factor: int = 1):
     """Returns the keypoints from the prediction
 
     Args:
@@ -13,7 +13,7 @@ def get_keypoints_from_pred(pred: np.ndarray, shape: tuple[int, int] = (56, 80),
         factor: Extracted keypoints are multiplied with this. Defaults to 1.
 
     Returns:
-        Tuple of keypoints (vp, ll, lr)
+        Batch of Tuple of keypoints (vp, ll, lr)
     """
     batch_size = pred.shape[0]
     flattened_indices = torch.argmax(pred.view(batch_size, 3, -1), dim=2)

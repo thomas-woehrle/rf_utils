@@ -45,7 +45,8 @@ def img_with_lines_from_pred(image: np.ndarray, pred) -> np.ndarray:
     Returns:
         Image with lines
     """
-    vp_coords, ll_coords, lr_coords = get_keypoints_from_pred(pred, factor=4)
+    vp_coords, ll_coords, lr_coords = get_keypoints_from_pred(pred, factor=4)[0]
+    vp_coords, ll_coords, lr_coords = vp_coords.tolist(), ll_coords.tolist(), lr_coords.tolist()
     return img_with_lines_from_kps(image, vp_coords, ll_coords, lr_coords)
 
 
