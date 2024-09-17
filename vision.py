@@ -68,9 +68,9 @@ def find_intersection(line1: tuple[tuple[int, int], tuple[int, int]], line2: tup
     return (int(intersection_x), int(intersection_y))
 
 
-def get_coordinates_on_frame(vp: tuple[int, int], kp: tuple[int, int], dim: tuple[int, int] = (319, 223)) -> tuple[int, int]:
+def get_coordinates_on_frame(vp: np.ndarray, kp: np.ndarray,
+                             dim: tuple[int, int] = (319, 223)) -> np.ndarray:
     """Returns the coordinates of the kp projected on the lower half of the frame
-
     Args:
         vp: The vanishing points
         kp: The keypoint to be projected
@@ -79,10 +79,10 @@ def get_coordinates_on_frame(vp: tuple[int, int], kp: tuple[int, int], dim: tupl
     Returns:
         The projected keypoint
     """
-    line1 = (vp, kp)
+    line1 = (tuple(vp.astype(int)), tuple(kp.astype(int)))
     line2 = ((0, dim[1]), (dim[0], dim[1]))
     intersect = find_intersection(line1, line2)
-    if intersect == None:
+    if intersect is None:
         if torch.is_tensor(kp):
             kp = kp[0].item(), kp[1].item()
         return kp
@@ -95,9 +95,9 @@ def get_coordinates_on_frame(vp: tuple[int, int], kp: tuple[int, int], dim: tupl
         line2 = ((x, 0), (x, dim[1]))
         intersect = find_intersection(line1, line2)
 
-    if intersect == None:
+    if intersect is None:
         if torch.is_tensor(kp):
             kp = kp[0].item(), kp[1].item()
         return kp
 
-    return intersect
+    return np.array(intersect, dtype=np.float32)
