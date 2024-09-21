@@ -69,7 +69,7 @@ def find_intersection(line1: tuple[tuple[int, int], tuple[int, int]], line2: tup
 
 
 def get_coordinates_on_frame(vp: np.ndarray, kp: np.ndarray,
-                             dim: tuple[int, int] = (319, 223)) -> np.ndarray:
+                             dim: tuple[int, int] = (320, 224)) -> np.ndarray:
     """Returns the coordinates of the kp projected on the lower half of the frame
     Args:
         vp: The vanishing points
@@ -79,6 +79,7 @@ def get_coordinates_on_frame(vp: np.ndarray, kp: np.ndarray,
     Returns:
         The projected keypoint
     """
+    dim = (dim[0]-1, dim[1]-1)
     line1 = (tuple(vp.astype(int)), tuple(kp.astype(int)))
     line2 = ((0, dim[1]), (dim[0], dim[1]))
     intersect = find_intersection(line1, line2)
